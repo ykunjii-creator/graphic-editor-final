@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import java.util.Vector;
 
 public class GDrawingPanel extends JPanel {
@@ -57,7 +58,8 @@ public class GDrawingPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponents(g);
-		if (g != null) {
+
+		if (this.bufferImage != null) {
 			g.drawImage(this.bufferImage, 0, 0, null);
 		}
 	}
@@ -95,12 +97,14 @@ public class GDrawingPanel extends JPanel {
 			}
 		}
 		else {
-			GShape currentShape = toolBar.getShapeType().getShape();
-			this.shapes.add(currentShape);
-			this.transformer = new GDrawer(currentShape);
-
-			this.transformer.start(x, y);
-		}
+            for (GShape shape : shapes) {
+                shape.setSelected(false);
+            }
+            GShape currentShape = toolBar.getShapeType().getShape();
+            this.shapes.add(currentShape);
+            this.transformer = new GDrawer(currentShape);
+            this.transformer.start(x, y);
+        }
 		this.prepareDrawing();
 	}
 
@@ -125,7 +129,24 @@ public class GDrawingPanel extends JPanel {
 
 	private void finishTransform(int x, int y) {
 		this.transformer.finish(x, y);
-		this.transformer = null;
+        for (GShape shape : this.shapes) {
+            shape.setSelected(false);
+        }
+        Objects.requireNonNull(this.transformer).getShape().setSelected(true);
+
+        Graphics2D bufferGraphics = this.bufferImage.createGraphics();
+        bufferGraphics.setColor(this.getBackground());
+        bufferGraphics.fillRect(0, 0, this.getWidth(), this.getHeight());
+        bufferGraphics.setColor(this.getForeground());
+
+        for(GShape shape : this.shapes) {
+            shape.draw(bufferGraphics);
+        }
+        bufferGraphics.dispose();
+
+        repaint();
+
+        this.transformer = null;
 	}
 
 	private class MouseHandler implements MouseListener, MouseMotionListener {
@@ -193,7 +214,6 @@ public class GDrawingPanel extends JPanel {
 				}
 			}
 		}
-
 
 		@Override
 		public void mouseEntered(MouseEvent e) {

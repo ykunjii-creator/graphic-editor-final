@@ -7,9 +7,11 @@ import java.awt.*;
 abstract public class GTransformer {
     protected GShape shape;
 
-    public GTransformer(GShape shape) {
-        this.shape = shape;
+    public GTransformer(GShape shape) {this.shape = shape;}
+    public GShape getShape() {
+        return this.shape;
     }
+
     abstract public void start(int x, int y);
     abstract public void keep(int x, int y);
     abstract public void finish(int x, int y);

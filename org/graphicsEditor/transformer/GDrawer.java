@@ -9,6 +9,7 @@ public class GDrawer extends GTransformer{
     public GDrawer(GShape shape) {
         super(shape);
     }
+
     @Override
     public void start(int x, int y) {
         shape.setLocation0(x, y);
@@ -21,10 +22,12 @@ public class GDrawer extends GTransformer{
 
     @Override
     public void finish(int x, int y) {
+        shape.finish();
 
     }
 
     public void cont(int x, int y) {
+        shape.addPoint(x, y);
 
     }
 }
