@@ -86,10 +86,12 @@ abstract public class GShape implements Cloneable {
 
         g.transform(this.affineTransform);
 
+        g.draw(shape);
+
         if (isSelected) {
+            this.anchors.setPosition(this.shape.getBounds());
             this.anchors.draw(g);
         }
-        g.draw(shape);
 
         g.setTransform(oldTransform);
     }
@@ -103,8 +105,8 @@ abstract public class GShape implements Cloneable {
     public void finish() {}
 
     private static class Anchors {
-        public int w = 15;
-        public int h = 15;
+        public int w = 10;
+        public int h = 10;
 
         private final Ellipse2D[] anchors;
 
@@ -126,25 +128,35 @@ abstract public class GShape implements Cloneable {
         }
 
         public void setPosition(Rectangle br) {
-            int brw = br.width;
-            int brh = br.height;
+            int x1 = br.x;
+            int y1 = br.y;
 
-            this.anchors[EAnchor.eNW.ordinal()].setFrame(br.x, br.y - h, w, h);
-            this.anchors[EAnchor.eNN.ordinal()].setFrame(br.x + brw / 2, br.y - h, w, h);
-            this.anchors[EAnchor.eNE.ordinal()].setFrame(br.x + brw, br.y - h, w, h);
+            int x2 = br.x + br.width;
+            int y2 = br.y + br.height;
 
-            this.anchors[EAnchor.eEE.ordinal()].setFrame(br.x + brw, br.y + brh / 2, w, h);
+            int mx = br.x + br.width / 2;
+            int my = br.y + br.height / 2;
 
-            this.anchors[EAnchor.eSE.ordinal()].setFrame(br.x + brw, br.y + brh, w, h);
-            this.anchors[EAnchor.eSS.ordinal()].setFrame(br.x + brw / 2, br.y + brh, w, h);
-            this.anchors[EAnchor.eSW.ordinal()].setFrame(br.x, br.y + brh, w, h);
+            int hw = w / 2;
+            int hh = h / 2;
 
-            this.anchors[EAnchor.eWW.ordinal()].setFrame(br.x, br.y + brh / 2, w, h);
+            // 8개 resize anchor
+            this.anchors[EAnchor.eNW.ordinal()].setFrame(x1 - hw, y1 -hh, w, h);
+            this.anchors[EAnchor.eNN.ordinal()].setFrame(mx - hw, y1 -hh, w, h);
+            this.anchors[EAnchor.eNE.ordinal()].setFrame(x2 - hw, y1 -hh, w, h);
+
+            this.anchors[EAnchor.eEE.ordinal()].setFrame(x2 - hw, my -hh, w, h);
+
+            this.anchors[EAnchor.eSE.ordinal()].setFrame(x2 - hw, y2 -hh, w, h);
+            this.anchors[EAnchor.eSS.ordinal()].setFrame(mx - hw, y2 -hh, w, h);
+            this.anchors[EAnchor.eSW.ordinal()].setFrame(x1 - hw, y2 -hh, w, h);
+
+            this.anchors[EAnchor.eWW.ordinal()].setFrame(x1 - hw, my -hh, w, h);
            // this.anchors[EAnchor.eRotate.ordinal()].setFrame(br.x, br.y -h, w, h);
         }
 
         public void draw(Graphics2D g) {
-            for (int i = 0; i < EAnchor.values().length; i++) {
+            for (int i = 0; i < 8; i++) {
                 if (anchors[i] != null) {
                     g.draw(anchors[i]);
                 }
