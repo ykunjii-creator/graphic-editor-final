@@ -7,7 +7,7 @@ public class GPolygon extends GShape {
 
     public GPolygon() {
         this.polygon = new Polygon();
-        this.shape = new Polygon();
+        this.shape = this.polygon;
     }
 
     @Override
@@ -19,22 +19,27 @@ public class GPolygon extends GShape {
     @Override
     public void setLocation1(int x, int y) {
         int n = polygon.npoints;
-        polygon.xpoints[n - 1] = x;
-        polygon.ypoints[n - 1] = y;
-        polygon.invalidate();
+
+        if (n > 0) {
+            polygon.xpoints[n - 1] = x;
+            polygon.ypoints[n - 1] = y;
+            polygon.invalidate();
+        }
     }
 
     public void addPoint(int x, int y) {
         int n = polygon.npoints;
 
-        polygon.xpoints[n - 1] = x;
-        polygon.ypoints[n - 1] = y;
+        if (n > 0) {
+            polygon.xpoints[n - 1] = x;
+            polygon.ypoints[n - 1] = y;
 
-        polygon.addPoint(x, y); // 다음 임시점
-        polygon.invalidate();
+            polygon.addPoint(x, y); // 다음 임시점
+            polygon.invalidate();
+        }
     }
 
-    public void finishPolygon() {
+    public void finish() {
         if (polygon.npoints > 1) {
             polygon.npoints--;
             polygon.invalidate();

@@ -4,6 +4,7 @@ import org.graphicsEditor.shapes.GOval;
 import org.graphicsEditor.shapes.GPolygon;
 import org.graphicsEditor.shapes.GRectangle;
 import org.graphicsEditor.shapes.GShape;
+import org.graphicsEditor.shapes.GPolygon;
 
 public class GConstants {
     public enum EDrawingType {

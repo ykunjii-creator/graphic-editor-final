@@ -97,7 +97,6 @@ abstract public class GShape implements Cloneable {
     public void setLocation0(int x, int y) {}
     public void setLocation1(int x, int y) {}
     public void translate(int dx, int dy) {}
-
     public void scale(double sx, double sy, int cx, int cy) {}
 
     public void addPoint(int x, int y) {}

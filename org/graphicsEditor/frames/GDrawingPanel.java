@@ -124,6 +124,8 @@ public class GDrawingPanel extends JPanel {
 	}
 
 	private void continueDrawing(int x, int y) {
+        this.transformer.cont(x, y);
+        keepTransform(x, y);
 
 	}
 
