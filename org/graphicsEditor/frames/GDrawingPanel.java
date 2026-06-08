@@ -9,6 +9,7 @@ import org.graphicsEditor.transformer.GDrawer;
 import org.graphicsEditor.transformer.GScaler;
 import org.graphicsEditor.transformer.GTransformer;
 import org.graphicsEditor.transformer.GTranslator;
+import org.graphicsEditor.transformer.GRotator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,7 +86,7 @@ public class GDrawingPanel extends JPanel {
 				GShape.EAnchor eAnchor = shape.onShape(x, y);
 				if (eAnchor != null) {
 					if (eAnchor == GShape.EAnchor.eRotate) {
-						this.transformer = new GDrawer(shape);
+						this.transformer = new GRotator(shape);
 					} else if (eAnchor == GShape.EAnchor.eMove) {
 						this.transformer = new GTranslator(shape);
 					} else { // resize

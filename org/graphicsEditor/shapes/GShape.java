@@ -41,7 +41,17 @@ abstract public class GShape implements Cloneable {
     public GShape clone() {
         try {
             GShape cloned = (GShape) super.clone();
-            cloned.shape = (Shape) (((RectangularShape) this.shape).clone());
+
+            if (this.shape instanceof RectangularShape) {
+                cloned.shape = (Shape) ((RectangularShape) this.shape).clone();
+            } else {
+                cloned.shape = this.shape;
+            }
+
+            cloned.affineTransform = new AffineTransform(this.affineTransform);
+            cloned.anchors = new Anchors();
+            cloned.isSelected = false;
+
             return cloned;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
@@ -51,6 +61,7 @@ abstract public class GShape implements Cloneable {
     public boolean isSelected() {
         return isSelected;
     }
+
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
         if (isSelected) {
@@ -98,8 +109,25 @@ abstract public class GShape implements Cloneable {
 
     public void setLocation0(int x, int y) {}
     public void setLocation1(int x, int y) {}
-    public void translate(int dx, int dy) {}
-    public void scale(double sx, double sy, int cx, int cy) {}
+
+    public void translate(int dx, int dy) {
+        this.affineTransform.translate(dx, dy);
+    }
+
+    public void rotate(double angle, double centerX, double centerY) {
+        this.affineTransform.rotate(angle, centerX, centerY);
+    }
+
+    public Rectangle getBounds() {
+        Shape transformedShape = this.affineTransform.createTransformedShape(this.shape);
+        return transformedShape.getBounds();
+    }
+
+    public void scale(double sx, double sy, int anchorX, int anchorY) {
+        this.affineTransform.translate(anchorX, anchorY);
+        this.affineTransform.scale(sx, sy);
+        this.affineTransform.translate(-anchorX, -anchorY);
+    }
 
     public void addPoint(int x, int y) {}
     public void finish() {}
@@ -140,7 +168,7 @@ abstract public class GShape implements Cloneable {
             int hw = w / 2;
             int hh = h / 2;
 
-            // 8개 resize anchor
+
             this.anchors[EAnchor.eNW.ordinal()].setFrame(x1 - hw, y1 -hh, w, h);
             this.anchors[EAnchor.eNN.ordinal()].setFrame(mx - hw, y1 -hh, w, h);
             this.anchors[EAnchor.eNE.ordinal()].setFrame(x2 - hw, y1 -hh, w, h);
@@ -152,17 +180,41 @@ abstract public class GShape implements Cloneable {
             this.anchors[EAnchor.eSW.ordinal()].setFrame(x1 - hw, y2 -hh, w, h);
 
             this.anchors[EAnchor.eWW.ordinal()].setFrame(x1 - hw, my -hh, w, h);
-           // this.anchors[EAnchor.eRotate.ordinal()].setFrame(br.x, br.y -h, w, h);
+           this.anchors[EAnchor.eRotate.ordinal()].setFrame(mx - hw, y1 -30, w, h);
         }
 
         public void draw(Graphics2D g) {
-            for (int i = 0; i < 8; i++) {
+            Graphics2D g2 = (Graphics2D) g.create();
+
+            // resize anchor 8개 그리기 (회전 anchor 제외)
+            for (int i = EAnchor.eNW.ordinal(); i <= EAnchor.eWW.ordinal(); i++) {
                 if (anchors[i] != null) {
-                    g.draw(anchors[i]);
+                    g2.draw(anchors[i]);
                 }
             }
+
+            // 연결선 그리기: 위쪽 중앙 anchor(eNN) -> rotate.anchor
+            Ellipse2D rotateAnchor = anchors[EAnchor.eRotate.ordinal()];
+            Ellipse2D topAnchor = anchors[EAnchor.eNN.ordinal()];
+
+            int x1 = (int) topAnchor.getCenterX();
+            int y1 = (int) topAnchor.getCenterY();
+
+            int x2 = (int) rotateAnchor.getCenterX();
+            int y2 = (int) rotateAnchor.getCenterY();
+
+            g2.drawLine(x1, y1, x2, y2);
+
+            // 회전 아이콘 그리기
+            Font oldFont = g2.getFont();
+            g2.setFont(new Font("Dialog", Font.PLAIN, 20));
+
+            // 아이콘 위치 보정
+            g2.drawString("↻", x2 - 8, y2 + 5);
+
+            g2.setFont(oldFont);
+            g2.dispose();
         }
 
     }
-
 }
