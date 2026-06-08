@@ -1,8 +1,6 @@
 package org.graphicsEditor.frames;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 
@@ -33,12 +31,6 @@ public class GMainFrame extends JFrame {
 		this.add(drawingPanel, BorderLayout.CENTER);
 
 		this.drawingPanel.associateWith(this.toolBar);
-	}
-
-	private class TooButtonActionHandler implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		}
+        this.menuBar.associateWith(this.drawingPanel);
 	}
 }

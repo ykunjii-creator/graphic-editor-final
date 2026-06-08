@@ -20,6 +20,10 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+
 public class GDrawingPanel extends JPanel {
 	// declaration
 	private enum EDrawingState {
@@ -52,13 +56,33 @@ public class GDrawingPanel extends JPanel {
 	}
 	// setters and getters
 	public void associateWith(GShapeToolBar toolBar) {
-		this.toolBar = toolBar;
+        this.toolBar = toolBar;
 	}
+
+    public void reset() {
+        this.shapes.clear();
+        this.bufferImage = null;
+        this.transformer = null;
+        this.eDrawingState = EDrawingState.eIdle;
+        repaint();
+    }
+
+    public void saveImage(File file) {
+        try {
+            prepareDrawing();
+
+            if (this.bufferImage != null) {
+                ImageIO.write(this.bufferImage, "png", file);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	// methods
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponents(g);
+		super.paintComponent(g);
 
 		if (this.bufferImage != null) {
 			g.drawImage(this.bufferImage, 0, 0, null);
@@ -90,7 +114,7 @@ public class GDrawingPanel extends JPanel {
 					} else if (eAnchor == GShape.EAnchor.eMove) {
 						this.transformer = new GTranslator(shape);
 					} else { // resize
-						this.transformer = new GScaler(shape);
+						this.transformer = new GScaler(shape, eAnchor);
 					}
 					this.transformer.start(x, y);
 					break;

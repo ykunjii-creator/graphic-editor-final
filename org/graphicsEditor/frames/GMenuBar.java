@@ -13,4 +13,8 @@ public class GMenuBar extends JMenuBar {
 		this.fileMenu = new GFileMenu();
 		this.add(this.fileMenu);
 	}
+
+    public void associateWith(GDrawingPanel drawingPanel) {
+        this.fileMenu.associateWith(drawingPanel);
+    }
 }
